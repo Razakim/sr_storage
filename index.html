@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>R_Storage</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/card.css">
+  <link rel="stylesheet" href="css/preview.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar__logo">R_Storage</div>
+      <nav class="nav__list">
+        <div class="nav__item active" data-cat="all">
+          Tout
+          <div class="nav__dot nav__dot--all"></div>
+        </div>
+        <div class="nav__item" data-cat="videos">
+          Vidéos
+          <div class="nav__dot nav__dot--red"></div>
+        </div>
+        <div class="nav__item" data-cat="certificates">
+          Certificats
+          <div class="nav__dot nav__dot--green"></div>
+        </div>
+        <div class="nav__item" data-cat="images">
+          Images
+          <div class="nav__dot nav__dot--white"></div>
+        </div>
+        <div class="nav__item" data-cat="documents">
+          Documents
+          <div class="nav__dot nav__dot--blue"></div>
+        </div>
+      </nav>
+      <div class="sidebar__footer">
+        Taille totale<br>
+        <span id="file-count">0 fichier</span>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="topbar">
+        <div class="breadcrumb">R_Storage / <span id="breadcrumb-current">Tout</span></div>
+        <input type="text" class="search" id="search" placeholder="🔍 Rechercher...">
+      </div>
+
+      <div class="grid" id="grid">
+        <!-- Cards injected here -->
+      </div>
+    </main>
+  </div>
+
+  <div class="preview-modal" id="preview-modal">
+    <button class="preview-modal__close" onclick="closePreview()">✕</button>
+    <div class="preview-modal__content">
+      <div class="preview-modal__viewer" id="preview-viewer">
+        <!-- Preview injected here -->
+      </div>
+    </div>
+    <div class="preview-modal__sidebar">
+      <div class="preview-modal__title" id="preview-title">Nom du fichier</div>
+      <div class="preview-modal__meta">
+        <div class="preview-modal__meta-row">
+          <span class="preview-modal__meta-label">Type</span>
+          <span id="preview-type">PDF</span>
+        </div>
+        <div class="preview-modal__meta-row">
+          <span class="preview-modal__meta-label">Taille</span>
+          <span id="preview-size">0 MB</span>
+        </div>
+        <div class="preview-modal__meta-row">
+          <span class="preview-modal__meta-label">Ajouté</span>
+          <span id="preview-date">12 jan 2025</span>
+        </div>
+      </div>
+      <a href="#" class="preview-modal__download" id="preview-download" download>↓ Télécharger</a>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/filter.js"></script>
+  <script src="js/preview.js"></script>
+</body>
+
+</html>

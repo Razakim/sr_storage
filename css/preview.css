@@ -1,0 +1,126 @@
+.preview-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.preview-modal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.preview-modal__close {
+  position: absolute;
+  top: 24px; left: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 48px; height: 48px;
+  color: var(--text);
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: background 150ms;
+}
+
+.preview-modal__close:hover {
+  background: var(--bg);
+}
+
+.preview-modal__content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.preview-modal__viewer {
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  background: #F8FAFC;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-modal__viewer iframe,
+.preview-modal__viewer img,
+.preview-modal__viewer video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.preview-modal__sidebar {
+  width: 360px;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-modal__title {
+  font-family: var(--font-ui);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 32px;
+  word-break: break-word;
+  color: var(--text);
+}
+
+.preview-modal__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.preview-modal__meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 12px;
+}
+
+.preview-modal__meta-label {
+  color: var(--muted);
+}
+
+.preview-modal__download {
+  background: var(--gold);
+  color: #FFFFFF;
+  border: none;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: auto;
+  text-decoration: none;
+  display: block;
+  transition: filter 150ms;
+}
+
+.preview-modal__download:hover {
+  filter: brightness(1.1);
+}

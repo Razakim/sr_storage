@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  /* Light Theme */
+  --bg:      #F4F5F7;
+  --surface: #FFFFFF;
+  --border:  #E2E8F0;
+  --text:    #0F172A;
+  --muted:   #64748B;
+  --gold:    #3B82F6; /* Changed to a nice blue accent for light theme */
+  --red:     #EF4444;
+  --blue:    #3B82F6;
+  --green:   #10B981;
+
+  --font-ui:   'Inter', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
