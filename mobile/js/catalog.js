@@ -1,3 +1,6 @@
+const CACHE_KEY = 'catalog_snapshot';
+const CACHE_LS_KEY = 'r_storage_catalog_v1';
+
 const DEFAULT_CATEGORIES = [
   { id: 'all', name: 'Tout', slug: 'all', system: true },
   { id: 'videos', name: 'Vidéos', slug: 'videos', color: '#EF4444', system: true },
@@ -9,12 +12,10 @@ const DEFAULT_CATEGORIES = [
 const Catalog = {
   blobUrls: new Map(),
 
-  getBasePath() {
-    return '../';
-  },
+  getBasePath() { return '../'; },
 
   resolvePath(path) {
-    if (path.startsWith('blob:') || path.startsWith('http')) return path;
+    if (!path || path.startsWith('blob:') || path.startsWith('http')) return path || '';
     return this.getBasePath() + path;
   },
 
@@ -40,6 +41,35 @@ const Catalog = {
     return 'documents';
   },
 
+  loadSnapshotSync() {
+    try {
+      const raw = localStorage.getItem(CACHE_LS_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch { return null; }
+  },
+
+  async saveSnapshot(items, categories) {
+    const portable = items.map(i => ({
+      ...i,
+      path: i.source === 'user' ? null : i.path?.replace(this.getBasePath(), '') || i.path
+    }));
+    const snap = { items: portable, categories, savedAt: Date.now() };
+    localStorage.setItem(CACHE_LS_KEY, JSON.stringify(snap));
+    try {
+      await MobileDB.put('catalog_cache', { key: CACHE_KEY, ...snap });
+    } catch { /* offline ok */ }
+  },
+
+  restoreFromSnapshot(snap) {
+    if (!snap?.items) return { items: [], categories: DEFAULT_CATEGORIES };
+    const items = snap.items.map(i => ({
+      ...i,
+      path: i.path ? this.resolvePath(i.path) : ''
+    }));
+    return { items, categories: snap.categories || DEFAULT_CATEGORIES };
+  },
+
   async getStaticItems() {
     if (typeof R_Storage !== 'undefined') {
       return R_Storage.map(item => ({
@@ -57,7 +87,7 @@ const Catalog = {
     const items = [];
 
     for (const f of files) {
-      let path = f.path;
+      let path = '';
       if (f.blobKey) {
         if (!this.blobUrls.has(f.blobKey)) {
           const blob = await MobileDB.getBlob(f.blobKey);
@@ -65,11 +95,7 @@ const Catalog = {
         }
         path = this.blobUrls.get(f.blobKey) || '';
       }
-      items.push({
-        ...f,
-        source: 'user',
-        path
-      });
+      items.push({ ...f, source: 'user', path });
     }
     return items;
   },
@@ -100,16 +126,19 @@ const Catalog = {
     }
 
     const slug = 'custom-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const id = crypto.randomUUID();
     const category = {
-      id: crypto.randomUUID(),
+      id,
       userId,
       name,
       slug,
       color: color || '#3B82F6',
       icon: icon || '📁',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      _sync: Sync.meta(id)
     };
     await MobileDB.put('categories', category);
+    await Sync.queue('categories', 'insert', category);
     return category;
   },
 
@@ -117,6 +146,7 @@ const Catalog = {
     const cat = await MobileDB.get('categories', categoryId);
     if (!cat || cat.userId !== userId) throw new Error('Catégorie introuvable');
     await MobileDB.delete('categories', categoryId);
+    await Sync.queue('categories', 'delete', { id: categoryId });
   },
 
   async addFile(userId, file, meta) {
@@ -124,8 +154,9 @@ const Catalog = {
     await MobileDB.saveBlob(blobKey, file);
 
     const type = this.getFileType(file.name);
+    const id = 'user-' + crypto.randomUUID();
     const item = {
-      id: 'user-' + crypto.randomUUID(),
+      id,
       userId,
       name: meta.name || file.name.replace(/\.[^.]+$/, ''),
       category: meta.category || this.inferCategory(type),
@@ -135,9 +166,11 @@ const Catalog = {
       sizeBytes: file.size,
       date: new Date().toISOString().slice(0, 10),
       blobKey,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      _sync: Sync.meta(id)
     };
     await MobileDB.put('files', item);
+    await Sync.queue('files', 'insert', { ...item, blobKey });
     return item;
   },
 
@@ -152,24 +185,20 @@ const Catalog = {
       }
     }
     await MobileDB.delete('files', fileId);
+    await Sync.queue('files', 'delete', { id: fileId });
   },
 
   filterItems(items, { category, subcategory, search, customCategoryId }) {
     let result = items;
-
     if (category && category !== 'all') {
       result = result.filter(i => i.category === category);
     }
-
     if (customCategoryId) {
-      const cat = customCategoryId;
-      result = result.filter(i => i.category === cat || i.customCategory === cat);
+      result = result.filter(i => i.category === customCategoryId || i.customCategory === customCategoryId);
     }
-
     if (subcategory && subcategory !== 'all') {
       result = result.filter(i => i.subcategory === subcategory);
     }
-
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(i =>
@@ -177,15 +206,12 @@ const Catalog = {
         (i.subcategory && i.subcategory.toLowerCase().includes(q))
       );
     }
-
     return result;
   },
 
   getStats(items) {
     const cats = {};
-    items.forEach(i => {
-      cats[i.category] = (cats[i.category] || 0) + 1;
-    });
+    items.forEach(i => { cats[i.category] = (cats[i.category] || 0) + 1; });
     return {
       total: items.length,
       videos: cats.videos || 0,

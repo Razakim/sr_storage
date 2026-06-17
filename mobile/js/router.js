@@ -1,16 +1,15 @@
 const Router = {
-  current: 'welcome',
+  current: 'home',
   history: [],
   listeners: [],
 
   init() {
     window.addEventListener('hashchange', () => this.resolve());
-    this.resolve();
   },
 
   resolve() {
-    const hash = (location.hash || '#welcome').slice(1);
-    const screen = hash.split('/')[0] || 'welcome';
+    const hash = (location.hash || '#home').slice(1);
+    const screen = hash.split('/')[0] || 'home';
     this.navigate(screen, false);
   },
 
@@ -26,28 +25,26 @@ const Router = {
   },
 
   back() {
+    const from = this.current;
+    if (from === 'register') {
+      this.history = [];
+      this.navigate('profile', true);
+      return;
+    }
+    if (from === 'categories') {
+      this.history = [];
+      this.navigate('profile', true);
+      return;
+    }
     if (this.history.length > 0) {
-      const prev = this.history.pop();
-      this.navigate(prev);
+      this.navigate(this.history.pop(), true);
     } else {
-      this.navigate('home');
+      this.navigate('home', true);
     }
   },
 
   onChange(fn) {
     this.listeners.push(fn);
-  },
-
-  titles: {
-    welcome: 'R_Storage',
-    register: 'Inscription',
-    login: 'Connexion',
-    home: 'Accueil',
-    browse: 'Explorer',
-    search: 'Rechercher',
-    add: 'Ajouter',
-    profile: 'Compte',
-    categories: 'Mes catégories'
   }
 };
 

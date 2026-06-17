@@ -1,5 +1,5 @@
 const DB_NAME = 'R_StorageMobile';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 const MobileDB = {
   db: null,
@@ -25,6 +25,13 @@ const MobileDB = {
         }
         if (!db.objectStoreNames.contains('blobs')) {
           db.createObjectStore('blobs', { keyPath: 'key' });
+        }
+        if (!db.objectStoreNames.contains('sync_queue')) {
+          const q = db.createObjectStore('sync_queue', { keyPath: 'id', autoIncrement: true });
+          q.createIndex('status', 'status', { unique: false });
+        }
+        if (!db.objectStoreNames.contains('catalog_cache')) {
+          db.createObjectStore('catalog_cache', { keyPath: 'key' });
         }
       };
       req.onsuccess = () => { this.db = req.result; resolve(this.db); };

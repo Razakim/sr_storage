@@ -4,11 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#0A0A0F">
+  <meta name="theme-color" content="#F4F5F7">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="R_Storage">
-  <meta name="mobile-web-app-capable" content="yes">
   <title>R_Storage</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
@@ -32,76 +31,16 @@
   </div>
 
   <div id="app">
-    <header class="app-header" id="app-header">
-      <button class="app-header__back hidden" id="header-back" aria-label="Retour">
+    <header class="app-header hidden" id="app-header">
+      <button class="app-header__back" id="header-back" aria-label="Retour">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <h1 class="app-header__title" id="header-title">R_Storage</h1>
-      <button class="app-header__action hidden" id="header-action"></button>
     </header>
 
-    <main class="app-main" id="app-main">
-
-      <!-- WELCOME -->
-      <section class="screen active" id="screen-welcome">
-        <div class="welcome">
-          <div class="welcome__brand">
-            <div class="welcome__logo">R</div>
-            <h2 class="welcome__title">R_Storage</h2>
-            <p class="welcome__subtitle">Votre espace personnel — certificats, vidéos, images et documents, partout avec vous.</p>
-          </div>
-          <div class="welcome__actions">
-            <button class="btn btn--primary" id="btn-go-register">S'inscrire</button>
-            <button class="btn btn--secondary" id="btn-go-login">Se connecter</button>
-            <button class="btn btn--ghost" id="btn-guest">Continuer en invité →</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- REGISTER -->
-      <section class="screen" id="screen-register">
-        <form class="auth-form" id="form-register">
-          <div class="form-group">
-            <label class="form-label" for="reg-name">Nom complet</label>
-            <input class="form-input" id="reg-name" type="text" placeholder="Votre nom" required autocomplete="name">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-email">Email</label>
-            <input class="form-input" id="reg-email" type="email" placeholder="vous@email.com" required autocomplete="email">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-password">Mot de passe</label>
-            <input class="form-input" id="reg-password" type="password" placeholder="6 caractères minimum" required autocomplete="new-password">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-confirm">Confirmer</label>
-            <input class="form-input" id="reg-confirm" type="password" placeholder="Retapez le mot de passe" required autocomplete="new-password">
-          </div>
-          <div class="form-error" id="register-error"></div>
-          <button class="btn btn--primary" type="submit">Créer mon compte</button>
-          <p class="auth-switch">Déjà un compte ? <button type="button" id="btn-switch-login">Se connecter</button></p>
-        </form>
-      </section>
-
-      <!-- LOGIN -->
-      <section class="screen" id="screen-login">
-        <form class="auth-form" id="form-login">
-          <div class="form-group">
-            <label class="form-label" for="login-email">Email</label>
-            <input class="form-input" id="login-email" type="email" placeholder="vous@email.com" required autocomplete="email">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="login-password">Mot de passe</label>
-            <input class="form-input" id="login-password" type="password" placeholder="Votre mot de passe" required autocomplete="current-password">
-          </div>
-          <div class="form-error" id="login-error"></div>
-          <button class="btn btn--primary" type="submit">Se connecter</button>
-          <p class="auth-switch">Pas encore de compte ? <button type="button" id="btn-switch-register">S'inscrire</button></p>
-        </form>
-      </section>
+    <main class="app-main app-main--with-nav app-main--tabs" id="app-main">
 
       <!-- HOME -->
-      <section class="screen" id="screen-home">
+      <section class="screen active" id="screen-home">
         <div class="home-greeting" id="home-greeting"></div>
         <div class="stat-row">
           <div class="stat-card"><div class="stat-card__value" id="stat-total">0</div><div class="stat-card__label">Total</div></div>
@@ -133,7 +72,7 @@
         <div class="search-bar">
           <div class="search-bar__input-wrap">
             <svg class="search-bar__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            <input class="search-bar__input" id="search-input" type="search" placeholder="Rechercher un fichier..." autocomplete="off">
+            <input class="search-bar__input" id="search-input" type="search" placeholder="Rechercher..." autocomplete="off">
           </div>
         </div>
         <div id="search-results"></div>
@@ -141,18 +80,23 @@
 
       <!-- ADD -->
       <section class="screen" id="screen-add">
-        <div class="add-screen">
+        <div id="add-auth-gate" class="auth-gate hidden">
+          <div class="auth-gate__icon">🔐</div>
+          <div class="auth-gate__title">Connexion requise</div>
+          <p class="auth-gate__text">Connectez-vous pour ajouter des fichiers et créer des catégories.</p>
+          <button class="btn btn--primary" id="btn-goto-profile">Se connecter</button>
+        </div>
+        <div id="add-content" class="add-screen">
           <div class="add-tabs">
             <button class="add-tabs__btn active" id="add-tabs-file">Fichier</button>
             <button class="add-tabs__btn" id="add-tabs-category">Catégorie</button>
           </div>
-
           <div id="add-panel-file">
             <div class="upload-zone" id="upload-zone">
               <div class="upload-zone__icon">📁</div>
               <div class="upload-zone__title">Ajouter un fichier</div>
-              <p class="upload-zone__hint">PDF, images, vidéos — glissez ou sélectionnez</p>
-              <button type="button" class="btn btn--secondary" id="btn-pick-file">Choisir un fichier</button>
+              <p class="upload-zone__hint">PDF, images, vidéos</p>
+              <button type="button" class="btn btn--secondary" id="btn-pick-file">Choisir</button>
               <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.doc,.docx">
             </div>
             <div class="upload-preview" id="upload-preview">
@@ -175,19 +119,17 @@
                 <select class="form-input" id="add-category"></select>
               </div>
               <div class="form-group">
-                <label class="form-label" for="add-subcategory">Sous-catégorie (optionnel)</label>
-                <input class="form-input" id="add-subcategory" type="text" placeholder="Ex: Cisco, Personnel...">
+                <label class="form-label" for="add-subcategory">Sous-catégorie</label>
+                <input class="form-input" id="add-subcategory" type="text" placeholder="Ex: Cisco">
               </div>
-              <div class="progress-bar" id="upload-progress"><div class="progress-bar__fill" style="width:100%"></div></div>
               <button class="btn btn--primary" type="submit" id="btn-upload">Enregistrer</button>
             </form>
           </div>
-
           <div id="add-panel-category" class="hidden">
             <form class="add-form category-form" id="form-add-category">
               <div class="form-group">
-                <label class="form-label" for="cat-name">Nom de la catégorie</label>
-                <input class="form-input" id="cat-name" type="text" placeholder="Ex: Projets, Formation..." required maxlength="30">
+                <label class="form-label" for="cat-name">Nom</label>
+                <input class="form-input" id="cat-name" type="text" placeholder="Ex: Projets" required maxlength="30">
               </div>
               <div class="form-group">
                 <label class="form-label">Couleur</label>
@@ -211,7 +153,7 @@
                   <button type="button" class="icon-picker__btn" data-icon="🔖">🔖</button>
                 </div>
               </div>
-              <button class="btn btn--primary" type="submit">Créer la catégorie</button>
+              <button class="btn btn--primary" type="submit">Créer</button>
             </form>
           </div>
         </div>
@@ -219,46 +161,80 @@
 
       <!-- PROFILE -->
       <section class="screen" id="screen-profile">
-        <div class="profile-card">
-          <div class="profile-card__avatar" id="profile-avatar">R</div>
-          <div>
-            <div class="profile-card__name" id="profile-name">—</div>
-            <div class="profile-card__email" id="profile-email">—</div>
+        <div id="profile-auth" class="profile-auth">
+          <form class="auth-form" id="form-login">
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email</label>
+              <input class="form-input" id="login-email" type="email" placeholder="vous@email.com" required autocomplete="email">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="login-password">Mot de passe</label>
+              <input class="form-input" id="login-password" type="password" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+            <div class="form-error" id="login-error"></div>
+            <button class="btn btn--primary" type="submit">Se connecter</button>
+            <button type="button" class="btn btn--secondary" id="btn-go-register">Créer un compte</button>
+          </form>
+        </div>
+        <div id="profile-logged-in" class="hidden">
+          <div class="profile-card">
+            <div class="profile-card__avatar" id="profile-avatar">R</div>
+            <div>
+              <div class="profile-card__name" id="profile-name">—</div>
+              <div class="profile-card__email" id="profile-email">—</div>
+            </div>
           </div>
-        </div>
-        <div class="install-banner hidden" id="install-banner">
-          <div class="install-banner__text"><strong>Installer R_Storage</strong>Accès rapide depuis votre écran d'accueil</div>
-          <button class="btn btn--primary" style="width:auto;padding:10px 16px;font-size:13px" id="btn-install">Installer</button>
-        </div>
-        <div class="profile-menu">
-          <button class="profile-menu__item" id="btn-my-categories">
-            <span class="profile-menu__icon">🏷️</span>
-            Mes catégories
-            <span class="profile-menu__chevron">›</span>
-          </button>
-          <button class="profile-menu__item" id="btn-desktop">
-            <span class="profile-menu__icon">🖥️</span>
-            Version bureau
-            <span class="profile-menu__chevron">›</span>
-          </button>
-          <button class="profile-menu__item" id="btn-logout">
-            <span class="profile-menu__icon">🚪</span>
-            Se déconnecter
-            <span class="profile-menu__chevron">›</span>
-          </button>
+          <div class="install-banner hidden" id="install-banner">
+            <div class="install-banner__text"><strong>Installer R_Storage</strong>Accès depuis l'écran d'accueil</div>
+            <button class="btn btn--primary" style="width:auto;padding:10px 16px;font-size:13px" id="btn-install">Installer</button>
+          </div>
+          <div class="profile-menu">
+            <button class="profile-menu__item" id="btn-my-categories">
+              <span class="profile-menu__icon">🏷️</span> Mes catégories <span class="profile-menu__chevron">›</span>
+            </button>
+            <button class="profile-menu__item" id="btn-desktop">
+              <span class="profile-menu__icon">🖥️</span> Version bureau <span class="profile-menu__chevron">›</span>
+            </button>
+            <button class="profile-menu__item" id="btn-logout">
+              <span class="profile-menu__icon">🚪</span> Se déconnecter <span class="profile-menu__chevron">›</span>
+            </button>
+          </div>
         </div>
       </section>
 
-      <!-- CATEGORIES -->
+      <!-- REGISTER (sous-écran) -->
+      <section class="screen" id="screen-register">
+        <form class="auth-form" id="form-register" style="padding:16px 20px">
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Nom</label>
+            <input class="form-input" id="reg-name" type="text" required autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email</label>
+            <input class="form-input" id="reg-email" type="email" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Mot de passe</label>
+            <input class="form-input" id="reg-password" type="password" required autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-confirm">Confirmer</label>
+            <input class="form-input" id="reg-confirm" type="password" required autocomplete="new-password">
+          </div>
+          <div class="form-error" id="register-error"></div>
+          <button class="btn btn--primary" type="submit">Créer mon compte</button>
+        </form>
+      </section>
+
+      <!-- CATEGORIES (sous-écran) -->
       <section class="screen" id="screen-categories">
         <div class="category-list" id="categories-list"></div>
       </section>
 
     </main>
 
-    <!-- BOTTOM NAV -->
-    <nav class="bottom-nav hidden" id="bottom-nav">
-      <button class="bottom-nav__item" data-screen="home">
+    <nav class="bottom-nav" id="bottom-nav">
+      <button class="bottom-nav__item active" data-screen="home">
         <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>
         <span>Accueil</span>
       </button>
@@ -266,7 +242,7 @@
         <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
         <span>Explorer</span>
       </button>
-      <button class="bottom-nav__item bottom-nav__item--add bottom-nav__item--locked" data-screen="add" id="nav-add">
+      <button class="bottom-nav__item bottom-nav__item--add" data-screen="add">
         <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
         <span>Ajouter</span>
       </button>
@@ -274,14 +250,13 @@
         <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span>
         <span>Recherche</span>
       </button>
-      <button class="bottom-nav__item bottom-nav__item--locked" data-screen="profile" id="nav-profile">
+      <button class="bottom-nav__item" data-screen="profile">
         <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
         <span>Compte</span>
       </button>
     </nav>
   </div>
 
-  <!-- PREVIEW SHEET -->
   <div class="preview-sheet" id="preview-sheet">
     <div class="preview-sheet__backdrop" id="preview-backdrop"></div>
     <div class="preview-sheet__panel">
@@ -307,7 +282,6 @@
     </div>
   </div>
 
-  <!-- FULLSCREEN -->
   <div class="fullscreen-preview" id="fullscreen-preview">
     <div class="fullscreen-preview__header">
       <button class="fullscreen-preview__close" id="fullscreen-close">✕</button>
@@ -320,6 +294,7 @@
 
   <script src="../js/data.js"></script>
   <script src="js/db.js"></script>
+  <script src="js/sync.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/catalog.js"></script>
   <script src="js/router.js"></script>

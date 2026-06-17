@@ -14,40 +14,22 @@ const Auth = {
   },
 
   generateSalt() {
-    const arr = crypto.getRandomValues(new Uint8Array(16));
-    return arr;
+    return crypto.getRandomValues(new Uint8Array(16));
   },
 
   generateId() {
     return crypto.randomUUID();
   },
 
-  generateToken() {
-    const arr = crypto.getRandomValues(new Uint8Array(32));
-    return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
-  },
-
   getSession() {
     try {
       const raw = localStorage.getItem(this.SESSION_KEY);
-      if (!raw) return null;
-      const session = JSON.parse(raw);
-      if (session.expiresAt && Date.now() > session.expiresAt) {
-        this.clearSession();
-        return null;
-      }
-      return session;
+      return raw ? JSON.parse(raw) : null;
     } catch { return null; }
   },
 
-  setSession(userId, token) {
-    const session = {
-      userId,
-      token,
-      expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000
-    };
-    localStorage.setItem(this.SESSION_KEY, JSON.stringify(session));
-    return session;
+  setSession(userId) {
+    localStorage.setItem(this.SESSION_KEY, JSON.stringify({ userId }));
   },
 
   clearSession() {
@@ -56,17 +38,35 @@ const Auth = {
 
   async getCurrentUser() {
     const session = this.getSession();
-    if (!session) return null;
-    const user = await MobileDB.get('users', session.userId);
-    if (!user || user.token !== session.token) {
-      this.clearSession();
-      return null;
-    }
-    return user;
+    if (!session?.userId) return null;
+    return MobileDB.get('users', session.userId);
   },
 
   isLoggedIn() {
-    return !!this.getSession();
+    return !!this.getSession()?.userId;
+  },
+
+  async ensureSeedUser() {
+    const email = 'srazakim@gmail.com';
+    const existing = await MobileDB.get('usersByEmail', email);
+    if (existing) return;
+
+    const salt = this.generateSalt();
+    const passwordHash = await this.hashPassword('Razakim2007', salt);
+    const id = '00000000-0000-4000-8000-000000000001';
+
+    const user = {
+      id,
+      name: 'Srazakim',
+      email,
+      passwordHash,
+      salt: Array.from(salt),
+      createdAt: new Date().toISOString(),
+      _sync: Sync.meta(id)
+    };
+
+    await MobileDB.put('users', user);
+    await MobileDB.put('usersByEmail', { email, userId: id });
   },
 
   async register({ name, email, password }) {
@@ -82,7 +82,6 @@ const Auth = {
 
     const salt = this.generateSalt();
     const passwordHash = await this.hashPassword(password, salt);
-    const token = this.generateToken();
     const id = this.generateId();
 
     const user = {
@@ -91,13 +90,14 @@ const Auth = {
       email,
       passwordHash,
       salt: Array.from(salt),
-      token,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      _sync: Sync.meta(id)
     };
 
     await MobileDB.put('users', user);
     await MobileDB.put('usersByEmail', { email, userId: id });
-    this.setSession(id, token);
+    await Sync.queue('users', 'insert', { id, name, email });
+    this.setSession(id);
     return user;
   },
 
@@ -113,22 +113,11 @@ const Auth = {
     const hash = await this.hashPassword(password, salt);
     if (hash !== user.passwordHash) throw new Error('Email ou mot de passe incorrect');
 
-    const token = this.generateToken();
-    user.token = token;
-    await MobileDB.put('users', user);
-    this.setSession(user.id, token);
+    this.setSession(user.id);
     return user;
   },
 
   async logout() {
-    const session = this.getSession();
-    if (session) {
-      const user = await MobileDB.get('users', session.userId);
-      if (user) {
-        user.token = null;
-        await MobileDB.put('users', user);
-      }
-    }
     this.clearSession();
   }
 };

@@ -58,11 +58,11 @@ const Render = {
 
   fileCard(item) {
     const el = document.createElement('article');
-    el.className = 'file-card animate-in';
+    el.className = 'file-card';
     el.dataset.lazyId = item.id;
     el.innerHTML = `
       <div class="file-card__preview">
-        <div class="skeleton" style="width:100%;height:100%;position:absolute;inset:0"></div>
+        <span class="file-card__icon">${this.typeIcon(item.type)}</span>
         <span class="file-card__type-badge">${item.type}</span>
       </div>
       <div class="file-card__body">
@@ -77,12 +77,19 @@ const Render = {
     return el;
   },
 
+  typeIcon(type) {
+    if (type === 'pdf') return '📄';
+    if (type === 'mp4') return '🎬';
+    if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(type)) return '🖼️';
+    return '📎';
+  },
+
   fileRow(item) {
     const el = document.createElement('article');
-    el.className = 'file-row animate-in';
+    el.className = 'file-row';
     el.dataset.lazyId = item.id;
     el.innerHTML = `
-      <div class="file-row__thumb"><div class="skeleton" style="width:100%;height:100%"></div></div>
+      <div class="file-row__thumb"><span>${this.typeIcon(item.type)}</span></div>
       <div class="file-row__info">
         <div class="file-row__name">${this.escape(item.name)}</div>
         <div class="file-row__meta">${item.type.toUpperCase()} · ${item.size}</div>
@@ -97,7 +104,7 @@ const Render = {
     el.className = 'recent-card';
     el.dataset.lazyId = item.id;
     el.innerHTML = `
-      <div class="recent-card__preview"><div class="skeleton" style="width:100%;height:100%"></div></div>
+      <div class="recent-card__preview"><span>${this.typeIcon(item.type)}</span></div>
       <div class="recent-card__body">
         <div class="recent-card__name">${this.escape(item.name)}</div>
       </div>`;
