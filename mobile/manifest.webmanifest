@@ -1,0 +1,39 @@
+{
+  "name": "R_Storage",
+  "short_name": "R_Storage",
+  "description": "Votre espace personnel — vidéos, certificats, images, documents",
+  "start_url": "/mobile/",
+  "scope": "/mobile/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0A0A0F",
+  "theme_color": "#0A0A0F",
+  "lang": "fr",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Explorer",
+      "url": "/mobile/#browse",
+      "description": "Parcourir tous les fichiers"
+    },
+    {
+      "name": "Ajouter",
+      "url": "/mobile/#add",
+      "description": "Ajouter un fichier"
+    }
+  ]
+}
