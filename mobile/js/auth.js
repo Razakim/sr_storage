@@ -52,7 +52,7 @@ const Auth = {
     if (existing) return;
 
     const salt = this.generateSalt();
-    const passwordHash = await this.hashPassword('Razakim2007', salt);
+    const passwordHash = await this.hashPassword('Razakim2007.', salt);
     const id = '00000000-0000-4000-8000-000000000001';
 
     const user = {

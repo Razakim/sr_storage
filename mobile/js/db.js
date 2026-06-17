@@ -4,39 +4,54 @@ const DB_VERSION = 2;
 const MobileDB = {
   db: null,
 
-  open() {
-    if (this.db) return Promise.resolve(this.db);
+  _onUpgrade(db) {
+    if (!db.objectStoreNames.contains('users')) {
+      db.createObjectStore('users', { keyPath: 'id' });
+      db.createObjectStore('usersByEmail', { keyPath: 'email' });
+    }
+    if (!db.objectStoreNames.contains('categories')) {
+      const cat = db.createObjectStore('categories', { keyPath: 'id' });
+      cat.createIndex('userId', 'userId', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('files')) {
+      const files = db.createObjectStore('files', { keyPath: 'id' });
+      files.createIndex('userId', 'userId', { unique: false });
+      files.createIndex('category', 'category', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('blobs')) {
+      db.createObjectStore('blobs', { keyPath: 'key' });
+    }
+    if (!db.objectStoreNames.contains('sync_queue')) {
+      const q = db.createObjectStore('sync_queue', { keyPath: 'id', autoIncrement: true });
+      q.createIndex('status', 'status', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('catalog_cache')) {
+      db.createObjectStore('catalog_cache', { keyPath: 'key' });
+    }
+  },
+
+  _connect(version) {
     return new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, DB_VERSION);
-      req.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains('users')) {
-          db.createObjectStore('users', { keyPath: 'id' });
-          db.createObjectStore('usersByEmail', { keyPath: 'email' });
-        }
-        if (!db.objectStoreNames.contains('categories')) {
-          const cat = db.createObjectStore('categories', { keyPath: 'id' });
-          cat.createIndex('userId', 'userId', { unique: false });
-        }
-        if (!db.objectStoreNames.contains('files')) {
-          const files = db.createObjectStore('files', { keyPath: 'id' });
-          files.createIndex('userId', 'userId', { unique: false });
-          files.createIndex('category', 'category', { unique: false });
-        }
-        if (!db.objectStoreNames.contains('blobs')) {
-          db.createObjectStore('blobs', { keyPath: 'key' });
-        }
-        if (!db.objectStoreNames.contains('sync_queue')) {
-          const q = db.createObjectStore('sync_queue', { keyPath: 'id', autoIncrement: true });
-          q.createIndex('status', 'status', { unique: false });
-        }
-        if (!db.objectStoreNames.contains('catalog_cache')) {
-          db.createObjectStore('catalog_cache', { keyPath: 'key' });
+      const req = version != null
+        ? indexedDB.open(DB_NAME, version)
+        : indexedDB.open(DB_NAME);
+
+      req.onupgradeneeded = (e) => this._onUpgrade(e.target.result);
+      req.onsuccess = () => { this.db = req.result; resolve(this.db); };
+      req.onerror = () => {
+        const err = req.error;
+        if (version != null && err && err.name === 'VersionError') {
+          this._connect(null).then(resolve).catch(reject);
+        } else {
+          reject(err);
         }
       };
-      req.onsuccess = () => { this.db = req.result; resolve(this.db); };
-      req.onerror = () => reject(req.error);
     });
+  },
+
+  open() {
+    if (this.db) return Promise.resolve(this.db);
+    return this._connect(DB_VERSION);
   },
 
   tx(store, mode) {
