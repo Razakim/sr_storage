@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>R_Storage - Documents</title>
+  <title>R_Storage - Images</title>
   <link rel="stylesheet" href="../css/reset.css">
   <link rel="stylesheet" href="../css/tokens.css">
   <link rel="stylesheet" href="../css/layout.css">
@@ -31,11 +31,11 @@
           Certificats
           <div class="nav__dot nav__dot--green"></div>
         </div>
-        <div class="nav__item" data-cat="images">
+        <div class="nav__item active" data-cat="images">
           Images
           <div class="nav__dot nav__dot--white"></div>
         </div>
-        <div class="nav__item active" data-cat="documents">
+        <div class="nav__item" data-cat="documents">
           Documents
           <div class="nav__dot nav__dot--blue"></div>
         </div>
@@ -48,12 +48,8 @@
 
     <main class="main-content">
       <div class="topbar">
-        <div class="breadcrumb">R_Storage / <span id="breadcrumb-current">Documents</span></div>
+        <div class="breadcrumb">R_Storage / <span id="breadcrumb-current">Images</span></div>
         <input type="text" class="search" id="search" placeholder="Rechercher...">
-      </div>
-
-      <div class="chic-filters" id="chic-filters">
-        <!-- Dynamic sub-filters injected here -->
       </div>
 
       <div class="grid" id="grid">
@@ -87,7 +83,7 @@
     </div>
   </div>
 
-  <script>const ACTIVE_FILTER = 'documents';</script>
+  <script>const ACTIVE_FILTER = 'images';</script>
   <script>window.R_Storage_BASE_PATH = '../';</script>
   <script src="../js/data.js"></script>
   <script src="../js/render.js"></script>
